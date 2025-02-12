@@ -56,8 +56,7 @@ class ExcelImport implements ToCollection
             'last_transaction_date' => isset($row[8]) ? $this->parseDate($row[8]) : null,
             'last_visited_store' => $row[9] ?? null,
             'remaining_points' => isset($row[10]) && is_numeric($row[10]) ? (int) $row[10] : 0,
-            'points_last_updated' => isset($row[11]) ? $this->parseDate($row[11]) : now(),
-            'updated_at' => now(),
+            'points_last_updated' => isset($row[11]) && !empty($row[11]) ? $this->parseDate($row[11]) : ($existingData ? $existingData->points_last_updated : null),            'updated_at' => now(),
         ];
 
         if ($existingData) {
@@ -90,10 +89,10 @@ class ExcelImport implements ToCollection
             }
 
             try {
-                return Carbon::createFromFormat('d/m/Y', trim($value))->format('Y-m-d');
+                return Carbon::createFromFormat('j/n/Y', trim($value))->format('Y-m-d'); // Handles both d/m/Y and dd/mm/YYYY
             } catch (\Exception $e) {
                 Log::error("Invalid date format: " . $value);
-                return null; // Return null if it's not a valid date
+                return null; // Return null if invalid
             }
         }
 
