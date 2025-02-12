@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Excel File</title>
+    @vite('resources/css/app.css')
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-6">
+
+    <div class="w-full max-w-3xl bg-white shadow-lg rounded-xl p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Upload Excel File</h2>
+
+        @if(session('success'))
+            <p class="text-green-600 font-semibold">{{ session('success') }}</p>
+        @endif
+        @if($errors->any())
+            <p class="text-red-600 font-semibold">{{ implode('', $errors->all(':message')) }}</p>
+        @endif
+
+        <form action="{{ route('upload.excel') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <label class="block">
+                <span class="text-gray-700">Choose an Excel file</span>
+                <input type="file" name="file" required 
+                    class="block w-full mt-2 p-2 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
+            </label>
+            <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition">
+                Upload
+            </button>
+        </form>
+
+        @if(isset($data) && count($data) > 0)
+            <h3 class="text-xl font-semibold text-gray-800 mt-6">Stored Excel Data</h3>
+            <div class="overflow-x-auto mt-4">
+                <table class="w-full border-collapse bg-white shadow-md rounded-lg">
+                    <thead class="bg-gray-200 text-gray-700">
+                        <tr>
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Card No</th>
+                            <th class="p-3">Email</th>
+                            <th class="p-3">Last Name</th>
+                            <th class="p-3">Phone No</th>
+                            <th class="p-3">Brand</th>
+                            <th class="p-3">MFM Segment</th>
+                            <th class="p-3">TR Segment</th>
+                            <th class="p-3">NYSS Segment</th>
+                            <th class="p-3">Last Transaction</th>
+                            <th class="p-3">Last Store</th>
+                            <th class="p-3">Remaining Points</th>
+                            <th class="p-3">Points Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach($data as $row)
+                            <tr class="hover:bg-gray-100 transition">
+                                <td class="p-3 text-center">{{ $row->id }}</td>
+                                <td class="p-3">{{ $row->card_no }}</td>
+                                <td class="p-3">{{ $row->email }}</td>
+                                <td class="p-3">{{ $row->last_name }}</td>
+                                <td class="p-3">{{ $row->phone_no }}</td>
+                                <td class="p-3">{{ $row->brand }}</td>
+                                <td class="p-3">{{ $row->mfm_segment }}</td>
+                                <td class="p-3">{{ $row->tr_segment }}</td>
+                                <td class="p-3">{{ $row->nyss_segment }}</td>
+                                <td class="p-3">{{ $row->last_transaction_date }}</td>
+                                <td class="p-3">{{ $row->last_visited_store }}</td>
+                                <td class="p-3">{{ $row->remaining_points }}</td>
+                                <td class="p-3">{{ $row->points_last_updated }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+
+</body>
+</html>
