@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ExcelImport;
 use App\Models\Bnb;
+use App\Exports\DataExport; // You need to create this file
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class ExcelController extends Controller
 {
@@ -24,5 +27,17 @@ class ExcelController extends Controller
     {
         $data = Bnb::all();
         return view('upload', compact('data'));
+    }
+
+    public function downloadExcel()
+    {
+        return Excel::download(new DataExport, 'data.xlsx');
+    }
+    public function downloadPDF()
+    {
+        $data = Bnb::all();
+        $pdf = PDF::loadView('pdf.export', compact('data'));
+
+        return $pdf->download('data.pdf');
     }
 }

@@ -9,12 +9,16 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-6">
 
     <div class="w-full max-w-3xl bg-white shadow-lg rounded-xl p-6">
+        <div class="flex justify-center mb-4">
+            <img src="{{ asset('images/EDVERTICA.png') }}" alt="Upload Image" class="h-1 w-16 object-cover rounded-full">
+        </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Upload Excel File</h2>
 
         @if(session('success'))
             <p class="text-green-600 font-semibold">{{ session('success') }}</p>
         @endif
         @if($errors->any())
+        
             <p class="text-red-600 font-semibold">{{ implode('', $errors->all(':message')) }}</p>
         @endif
 
@@ -33,6 +37,19 @@
 
         @if(isset($data) && count($data) > 0)
             <h3 class="text-xl font-semibold text-gray-800 mt-6">Stored Excel Data</h3>
+            <div class="flex justify-center gap-8 mt-6">
+                <!-- Download Excel Button -->
+                <a href="{{ route('download.excel') }}" 
+                   class="flex items-center gap-2 justify-center  font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1 hover:scale-105">
+                    📊 Download Excel
+                </a>
+            
+                <!-- Download PDF Button -->
+                <a href="{{ route('download.pdf') }}" 
+                   class="flex items-center gap-2 justify-center font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1 hover:scale-105">
+                    📄 Download PDF
+                </a>
+            </div>
             <div class="overflow-x-auto mt-4">
                 <table class="w-full border-collapse bg-white shadow-md rounded-lg">
                     <thead class="bg-gray-200 text-gray-700">
@@ -61,9 +78,9 @@
                                 <td class="p-3">{{ $row->last_name }}</td>
                                 <td class="p-3">{{ $row->phone_no }}</td>
                                 <td class="p-3">{{ $row->brand }}</td>
-                                <td class="p-3">{{ $row->mfm_segment }}</td>
-                                <td class="p-3">{{ $row->tr_segment }}</td>
-                                <td class="p-3">{{ $row->nyss_segment }}</td>
+                                <td class="p-3">MFM {{ $row->mfm_segment }}</td>
+                                <td class="p-3">TR {{ $row->tr_segment }}</td>
+                                <td class="p-3">NYSS {{ $row->nyss_segment }}</td>
                                 <td class="p-3">{{ $row->last_transaction_date }}</td>
                                 <td class="p-3">{{ $row->last_visited_store }}</td>
                                 <td class="p-3">{{ $row->remaining_points }}</td>
