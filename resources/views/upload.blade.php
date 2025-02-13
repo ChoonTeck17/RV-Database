@@ -6,7 +6,7 @@
     <title>Upload Excel File</title>
     @vite('resources/css/app.css')
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-6">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-6 max-w-7xl w-full">
 
     <div class="w-full max-w-3xl bg-white shadow-lg rounded-xl p-6">
         <div class="flex justify-center mb-4">
@@ -29,6 +29,21 @@
                 <input type="file" name="file" required 
                     class="block w-full mt-2 p-2 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
             </label>
+
+            <br>
+                <label>
+                    <input type="checkbox" name="mfm_segment" value="1">  MFM Segment
+                </label>
+            
+                <label>
+                    <input type="checkbox" name="tr_segment" value="1">  TR Segment
+                </label>
+            
+                <label>
+                    <input type="checkbox" name="nyss_segment" value="1">  NYSS Segment
+                </label>
+            <br>
+
             <button type="submit" 
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition">
                 Upload
@@ -78,9 +93,9 @@
                                 <td class="p-3">{{ $row->last_name }}</td>
                                 <td class="p-3">{{ $row->phone_no }}</td>
                                 <td class="p-3">{{ $row->brand }}</td>
-                                <td class="p-3">MFM {{ $row->mfm_segment }}</td>
-                                <td class="p-3">TR {{ $row->tr_segment }}</td>
-                                <td class="p-3">NYSS {{ $row->nyss_segment }}</td>
+                                <td class="p-3">{{ $row->mfm_segment }}</td>
+                                <td class="p-3">{{ $row->tr_segment }}</td>
+                                <td class="p-3">{{ $row->nyss_segment }}</td>
                                 <td class="p-3">{{ $row->last_transaction_date }}</td>
                                 <td class="p-3">{{ $row->last_visited_store }}</td>
                                 <td class="p-3">{{ $row->remaining_points }}</td>

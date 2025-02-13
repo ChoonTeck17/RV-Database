@@ -2,100 +2,92 @@
 
 namespace App\Imports;
 
-use App\Models\Bnb;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;  
+use Carbon\Carbon;
 
 class ExcelImport implements ToCollection
 {
-    // public function collection(Collection $rows)
-    // {
-    //     $rows->shift();
+    protected $updateMFM;
+    protected $updateTR;
+    protected $updateNYSS;
 
-    //     foreach ($rows as $row) {
-            
-    //         DB::table('bnb')->updateOrInsert(
-    //             ['card_no' => $row[0]], // Condition: Match by card number
-    //             [
-    //                 'email' => $row[1],
-    //                 'last_name' => $row[2],
-    //                 'phone_no' => $row[3],
-    //                 'brand' => $row[4],
-    //                 'mfm_segment' => $row[5],
-    //                 'tr_segment' => $row[6],
-    //                 'nyss_segment' => $row[7],
-    //                 'last_transaction_date' => $this->parseDate($row[8]),
-    //                 'last_visited_store' => $row[9],
-    //                 'remaining_points' => isset($row[10]) && is_numeric($row[10]) ? (int) $row[10] : 0,
-    //                 'points_last_updated' => $this->parseDate($row[11]) ?? now(),
-    //                 'updated_at' => now()
-    //             ]
-                
-    //         );
-    //     }
-    // }
+    // Constructor to accept selected segments
+    public function __construct($updateMFM = false, $updateTR = false, $updateNYSS = false)
+    {
+        $this->updateMFM = $updateMFM;
+        $this->updateTR = $updateTR;
+        $this->updateNYSS = $updateNYSS;
+    }
 
     public function collection(Collection $rows)
-{
-    $rows->shift(); // Remove header row if present
+    {
+        $rows->shift(); // Remove header row
 
-    foreach ($rows as $row) {
-        $existingData = DB::table('bnb')->where('card_no', $row[0])->first();
+        foreach ($rows as $row) {
+            $cardNo = $row[0] ?? null;
+            if (!$cardNo) {
+                continue; // Skip empty card numbers
+            }
 
-        $newData = [
-            'email' => $row[1] ?? null,
-            'last_name' => $row[2] ?? null,
-            'phone_no' => $row[3] ?? null,
-            'brand' => $row[4] ?? null,
-            'mfm_segment' => $row[5] ?? null,
-            'tr_segment' => $row[6] ?? null,
-            'nyss_segment' => $row[7] ?? null,
-            'last_transaction_date' => isset($row[8]) ? $this->parseDate($row[8]) : null,
-            'last_visited_store' => $row[9] ?? null,
-            'remaining_points' => isset($row[10]) && is_numeric($row[10]) ? (int) $row[10] : 0,
-            'points_last_updated' => isset($row[11]) && !empty($row[11]) ? $this->parseDate($row[11]) : ($existingData ? $existingData->points_last_updated : null),            'updated_at' => now(),
-        ];
+            $existingData = DB::table('bnb')->where('card_no', $cardNo)->first();
 
-        if ($existingData) {
-            $existingArray = (array) $existingData;
-            $changes = [];
+            $newData = [
+                'email' => $row[1] ?? null,
+                'last_name' => $row[2] ?? null,
+                'phone_no' => $row[3] ?? null,
+                'brand' => $row[4] ?? null,
+                'last_transaction_date' => $this->parseDate($row[7] ?? null),
+                'last_visited_store' => $row[8] ?? null,
+                'remaining_points' => is_numeric($row[9] ?? null) ? (int) $row[9] : 0,
+                'points_last_updated' => $this->parseDate($row[10] ?? null) ?: ($existingData->points_last_updated ?? null),
+                'updated_at' => now(),
+            ];
 
-            foreach ($newData as $key => $value) {
-                if (isset($existingArray[$key]) && $existingArray[$key] != $value) {
-                    $changes[$key] = [
-                        'old' => $existingArray[$key],
-                        'new' => $value
-                    ];
+            // Extract segment name from "Segments" column
+            $segmentName = isset($row[5]) ? trim($row[5]) : null;
+
+            // **Update only selected segments** (set null if unchecked)
+            $newData['mfm_segment'] = $this->updateMFM ? ('MFM ' . $segmentName) : ($existingData->mfm_segment ?? null);
+            $newData['tr_segment'] = $this->updateTR ? ('TR ' . $segmentName) : ($existingData->tr_segment ?? null);
+            $newData['nyss_segment'] = $this->updateNYSS ? ('NYSS ' . $segmentName) : ($existingData->nyss_segment ?? null);
+
+            // **Log changes (if any)**
+            if ($existingData) {
+                $changes = [];
+                foreach ($newData as $key => $value) {
+                    if ($existingData->$key != $value) {
+                        $changes[$key] = ['old' => $existingData->$key, 'new' => $value];
+                    }
+                }
+
+                if (!empty($changes)) {
+                    Log::info("Updated Record for Card No: $cardNo", $changes);
                 }
             }
 
-            if (!empty($changes)) {
-                Log::info("Updated Record for Card No: {$row[0]}", $changes);
-            }
+            // **Perform update or insert**
+            DB::table('bnb')->updateOrInsert(['card_no' => $cardNo], $newData);
+        }
+    }
+
+    private function parseDate($value)
+    {
+        if (!$value) {
+            return null;
         }
 
-        // Perform update or insert
-        DB::table('bnb')->updateOrInsert(['card_no' => $row[0]], $newData);
-    }
-}
-
-        private function parseDate($value)
-        {
-            if (!$value) {
+        try {
+            return Carbon::createFromFormat('d/m/Y', $value);
+        } catch (\Exception $e) {
+            try {
+                return Carbon::parse($value); // Fallback for different formats
+            } catch (\Exception $e) {
                 return null;
             }
-
-            try {
-                return Carbon::createFromFormat('j/n/Y', trim($value))->format('Y-m-d'); // Handles both d/m/Y and dd/mm/YYYY
-            } catch (\Exception $e) {
-                Log::error("Invalid date format: " . $value);
-                return null; // Return null if invalid
-            }
         }
-
-        }
-
-
+    }
+}
+?>
