@@ -10,16 +10,11 @@ use Carbon\Carbon;
 
 class ExcelImport implements ToCollection
 {
-    protected $updateMFM;
-    protected $updateTR;
-    protected $updateNYSS;
+    protected $updateTADA;
 
-    // Constructor to accept selected segments
-    public function __construct($updateMFM = false, $updateTR = false, $updateNYSS = false)
+    public function __construct($updateTADA = false)
     {
-        $this->updateMFM = $updateMFM;
-        $this->updateTR = $updateTR;
-        $this->updateNYSS = $updateNYSS;
+        $this->updateTADA = $updateTADA;
     }
 
     public function collection(Collection $rows)
@@ -27,52 +22,55 @@ class ExcelImport implements ToCollection
         $rows->shift(); // Remove header row
 
         foreach ($rows as $row) {
-            $cardNo = $row[0] ?? null;
+            $cardNo = $row[0] ?? null; // Card number is the primary key
             if (!$cardNo) {
                 continue; // Skip empty card numbers
             }
 
             $existingData = DB::table('bnb')->where('card_no', $cardNo)->first();
 
-            $newData = [
-                'email' => $row[1] ?? null,
-                'last_name' => $row[2] ?? null,
-                'phone_no' => $row[3] ?? null,
-                'brand' => $row[4] ?? null,
-                'last_transaction_date' => $this->parseDate($row[7] ?? null),
-                'last_visited_store' => $row[8] ?? null,
-                'remaining_points' => is_numeric($row[9] ?? null) ? (int) $row[9] : 0,
-                'points_last_updated' => $this->parseDate($row[10] ?? null) ?: ($existingData->points_last_updated ?? null),
-                'updated_at' => now(),
-            ];
+            // Initialize the update array
+            $newData = ['updated_at' => now()];
 
-            // Extract segment name from "Segments" column
-            $segmentName = isset($row[5]) ? trim($row[5]) : null;
+            // **TADA Segment** - Ensure specific fields are updated
+            if ($this->updateTADA) {
+                $email = $row[1] ?? null;  // Ensure correct index for email
+                $lastName = $row[2] ?? null;
+                $lastTransactionDate = $this->parseDate($row[3] ?? null);
+                $lastVisitedStore = $row[4] ?? null;
 
-            // **Update only selected segments** (set null if unchecked)
-            $newData['mfm_segment'] = $this->updateMFM ? ('MFM ' . $segmentName) : ($existingData->mfm_segment ?? null);
-            $newData['tr_segment'] = $this->updateTR ? ('TR ' . $segmentName) : ($existingData->tr_segment ?? null);
-            $newData['nyss_segment'] = $this->updateNYSS ? ('NYSS ' . $segmentName) : ($existingData->nyss_segment ?? null);
+                $newData = array_merge($newData, [
+                    'email' => $email,
+                    'last_name' => $lastName,
+                    'last_transaction_date' => $lastTransactionDate,
+                    'last_visited_store' => $lastVisitedStore,
+                ]);
 
-            // **Log changes (if any)**
-            if ($existingData) {
-                $changes = [];
-                foreach ($newData as $key => $value) {
-                    if ($existingData->$key != $value) {
-                        $changes[$key] = ['old' => $existingData->$key, 'new' => $value];
-                    }
-                }
+                // Log changes for debugging
+                Log::info("Updating TADA fields for Card No: $cardNo", [
+                    'email' => $email,
+                    'last_name' => $lastName,
+                    'last_transaction_date' => $lastTransactionDate,
+                    'last_visited_store' => $lastVisitedStore,
+                ]);
 
-                if (!empty($changes)) {
-                    Log::info("Updated Record for Card No: $cardNo", $changes);
-                }
+                $this->updateTADAFile($cardNo, $newData); // Update TADA dataset as well
             }
 
-            // **Perform update or insert**
+            // Perform insert or update on `bnb` table
             DB::table('bnb')->updateOrInsert(['card_no' => $cardNo], $newData);
         }
     }
 
+    // Update TADA dataset
+    protected function updateTADAFile($cardNo, $newData)
+    {
+        DB::table('tada_raw_files')->updateOrInsert(['card_no' => $cardNo], array_merge($newData, ['updated_at' => now()]));
+
+        Log::info("Updated TADA Data for Card No: $cardNo", $newData);
+    }
+
+    // Helper method to parse dates
     private function parseDate($value)
     {
         if (!$value) {
@@ -90,4 +88,3 @@ class ExcelImport implements ToCollection
         }
     }
 }
-?>

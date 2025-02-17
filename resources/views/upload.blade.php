@@ -6,9 +6,9 @@
     <title>Upload Excel File</title>
     @vite('resources/css/app.css')
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-6 max-w-7xl w-full">
+<body class="flex items-center justify-center min-h-screen p-6">
 
-    <div class="w-full max-w-3xl bg-white shadow-lg rounded-xl p-6">
+    <div class="w-full max-w-5xl bg-gray-200 shadow-lg rounded-xl p-6">
         <div class="flex justify-center mb-4">
             <img src="{{ asset('images/EDVERTICA.png') }}" alt="Upload Image" class="h-1 w-16 object-cover rounded-full">
         </div>
@@ -29,26 +29,45 @@
                 <input type="file" name="file" required 
                     class="block w-full mt-2 p-2 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
             </label>
-
+        
             <br>
-                <label>
-                    <input type="checkbox" name="mfm_segment" value="1">  MFM Segment
-                </label>
+            <label>
+                <input type="checkbox" name="mfm_segment" value="1">  MFM Segment
+            </label>
             
-                <label>
-                    <input type="checkbox" name="tr_segment" value="1">  TR Segment
-                </label>
+            <label>
+                <input type="checkbox" name="tr_segment" value="1">  TR Segment
+            </label>
             
-                <label>
-                    <input type="checkbox" name="nyss_segment" value="1">  NYSS Segment
+            <label>
+                <input type="checkbox" name="nyss_segment" value="1">  NYSS Segment
+            </label>
+            
+            <!-- Add Radio Buttons for TADA, RFM, and NPS -->
+            <div class="mt-4">
+                <label class="block">
+                    <span class="text-gray-700">Select File Type:</span>
+                    <div class="space-x-4 mt-2">
+                        <label>
+                            <input type="radio" name="file_type" value="TADA" class="mr-2"> TADA Raw Files
+                        </label>
+                        <label>
+                            <input type="radio" name="file_type" value="RFM" class="mr-2"> RFM
+                        </label>
+                        <label>
+                            <input type="radio" name="file_type" value="NPS" class="mr-2"> NPS
+                        </label>
+                    </div>
                 </label>
+            </div>
+        
             <br>
-
             <button type="submit" 
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition">
                 Upload
             </button>
         </form>
+        
 
         @if(isset($data) && count($data) > 0)
             <h3 class="text-xl font-semibold text-gray-800 mt-6">Stored Excel Data</h3>
@@ -65,6 +84,7 @@
                     📄 Download PDF
                 </a>
             </div>
+            
             <div class="overflow-x-auto mt-4">
                 <table class="w-full border-collapse bg-white shadow-md rounded-lg">
                     <thead class="bg-gray-200 text-gray-700">
@@ -81,7 +101,7 @@
                             <th class="p-3">Last Transaction</th>
                             <th class="p-3">Last Store</th>
                             <th class="p-3">Remaining Points</th>
-                            <th class="p-3">Points Updated</th>
+                            <th class="p-3">Points Last Updated</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -103,6 +123,11 @@
                             </tr>
                         @endforeach
                     </tbody>
+                    
+                    <!-- Pagination Links -->
+                    <div class="mt-4">
+                        {{ $data->appends(['per_page' => request('per_page', 5)])->links() }}
+                    </div>                     
                 </table>
             </div>
         @endif

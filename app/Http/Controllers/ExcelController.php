@@ -20,31 +20,49 @@ class ExcelController extends Controller
             'mfm_segment' => 'required_without_all:tr_segment,nyss_segment',
             'tr_segment' => 'required_without_all:mfm_segment,nyss_segment',
             'nyss_segment' => 'required_without_all:mfm_segment,tr_segment',
+            'tada_segment' => 'nullable|boolean',
+            'rfm_segment' => 'nullable|boolean',
+            'nps_segment' => 'nullable|boolean',
         ], [
             'mfm_segment.required_without_all' => 'At least one segment must be selected.',
             'tr_segment.required_without_all' => '',
             'nyss_segment.required_without_all' => '',
+            'tada_segment.required_without_all' => '',
+            'rfm_segment.required_without_all' => '',
+            'nps_segment.required_without_all' => '',
         ]);
     
         // Get selected segments from form (checkbox values)
         $updateMFM = $request->has('mfm_segment');
         $updateTR = $request->has('tr_segment');
         $updateNYSS = $request->has('nyss_segment');
+        $updateTADA = $request->has('tada_segment');
+        $updateRFM = $request->has('rfm_segment');
+        $updateNPS = $request->has('nps_segment');
         
-        Log::info("MFM: {$updateMFM}, TR: {$updateTR}, NYSS: {$updateNYSS}");
+        Log::info("MFM: {$updateMFM}, TR: {$updateTR}, NYSS: {$updateNYSS}, TADA: {$updateTADA}, RFM: {$updateRFM}, NPS: {$updateNPS}");
 
         // Pass segment selections to the import class
-        Excel::import(new ExcelImport($updateMFM, $updateTR, $updateNYSS), $request->file('file'));
+        Excel::import(new ExcelImport($updateMFM, $updateTR, $updateNYSS, $updateTADA, $updateRFM, $updateNPS), $request->file('file'));
     
         return redirect()->back()->with('success', 'Data Imported Successfully!');
     }
     
 
-    public function showData()
+    // public function showData()
+    // {
+    //     $data = Bnb::all();
+    //     return view('upload', compact('data'));
+    // }
+
+    public function showData(Request $request)
     {
-        $data = Bnb::all();
+        $perPage = $request->input('per_page', 5); // Default to 10 records per page
+        $data = Bnb::paginate($perPage);
+
         return view('upload', compact('data'));
     }
+
 
     public function downloadExcel()
     {
