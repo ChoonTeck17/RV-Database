@@ -10,11 +10,21 @@ use Carbon\Carbon;
 
 class ExcelImport implements ToCollection
 {
+    protected $updateMFM;
+    protected $updateTR;
+    protected $updateNYSS;
     protected $updateTADA;
+    protected $updateRFM;
+    protected $updateNPS;
 
-    public function __construct($updateTADA = false)
+    public function __construct($updateMFM = false, $updateTR = false, $updateNYSS = false, $updateTADA = false, $updateRFM = false, $updateNPS = false)
     {
+        $this->updateMFM = $updateMFM;
+        $this->updateTR = $updateTR;
+        $this->updateNYSS = $updateNYSS;
         $this->updateTADA = $updateTADA;
+        $this->updateRFM = $updateRFM;
+        $this->updateNPS = $updateNPS;
     }
 
     public function collection(Collection $rows)
@@ -23,12 +33,18 @@ class ExcelImport implements ToCollection
 
         foreach ($rows as $row) {
             $cardNo = $row[0] ?? null; // Card number is the primary key
-            if (!$cardNo) {
-                continue; // Skip empty card numbers
+            if (empty($newData['email']) || empty($newData['last_name'])) {
+                Log::warning("Skipping Card No: $cardNo due to missing email or last name", $newData);
+                continue;
             }
 
             $existingData = DB::table('bnb')->where('card_no', $cardNo)->first();
-
+            if ($existingData) {
+                Log::info("Existing data found for Card No: $cardNo", (array) $existingData);
+            } else {
+                Log::info("No existing data found for Card No: $cardNo, inserting new record.");
+            }
+            
             // Initialize the update array
             $newData = ['updated_at' => now()];
 
@@ -57,8 +73,21 @@ class ExcelImport implements ToCollection
                 $this->updateTADAFile($cardNo, $newData); // Update TADA dataset as well
             }
 
-            // Perform insert or update on `bnb` table
-            DB::table('bnb')->updateOrInsert(['card_no' => $cardNo], $newData);
+            // Ensure all required fields are provided
+            if (isset($newData['email']) && isset($newData['last_name'])) {
+                DB::table('bnb')->updateOrInsert(
+                    ['card_no' => $cardNo], // Primary key
+                    [
+                        'email' => $email,
+                        'last_name' => $lastName,
+                        'last_transaction_date' => $lastTransactionDate,
+                        'last_visited_store' => $lastVisitedStore,
+                        'updated_at' => now(),
+                    ]
+                );                Log::info("Inserted/Updated record for Card No: $cardNo", $newData);
+            } else {
+                Log::warning("Skipping record for Card No: $cardNo due to missing required fields", $newData);
+            }
         }
     }
 
@@ -73,18 +102,18 @@ class ExcelImport implements ToCollection
     // Helper method to parse dates
     private function parseDate($value)
     {
-        if (!$value) {
-            return null;
-        }
-
+        if (!$value) return null;
+    
         try {
-            return Carbon::createFromFormat('d/m/Y', $value);
+            return Carbon::createFromFormat('d/m/Y', $value)->format('Y-m-d'); // Convert to MySQL format
         } catch (\Exception $e) {
             try {
-                return Carbon::parse($value); // Fallback for different formats
+                return Carbon::parse($value)->format('Y-m-d'); // Fallback for different formats
             } catch (\Exception $e) {
+                Log::error("Invalid date format for value: $value");
                 return null;
             }
         }
     }
+    
 }
