@@ -23,7 +23,7 @@ class ExcelController extends Controller
             $updateMFM = $request->has('mfm_segment');
             $updateTR = $request->has('tr_segment');
             $updateNYSS = $request->has('nyss_segment');
-            dd($updateMFM, $updateTR, $updateNYSS);
+            // dd($updateMFM, $updateTR, $updateNYSS);
 
             Excel::import(new ExcelImport($updateMFM, $updateTR, $updateNYSS), $request->file('file'));
 

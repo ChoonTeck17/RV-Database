@@ -1,3 +1,4 @@
+<!-- filepath: /A:/Coding Project/RV-Database/resources/views/upload.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,34 +36,19 @@
                     class="block w-full mt-2 p-2 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
             </label>
 
-            {{-- File Type Selection --}}
-            {{-- <div class="mt-4">
-                <span class="text-gray-700">Select File Type:</span>
-                <div class="space-x-4 mt-2">
-                    <label>
-                        <input type="radio" name="file_type" value="TADA" class="file-type-radio"> TADA Raw Files
-                    </label>
-                    <label>
-                        <input type="radio" name="file_type" value="RFM" class="file-type-radio"> RFM
-                    </label>
-                    <label>
-                        <input type="radio" name="file_type" value="NPS" class="file-type-radio" id="npsRadio"> NPS
-                    </label>
-                </div>
-            </div> --}}
-
             {{-- Segment Selection --}}
             <div class="grid grid-cols-3 gap-4 mt-2">
                 <span class="text-gray-700">Select Segments:</span>
                 <label>
                     <input type="checkbox" name="mfm_segment" value="1" class="segment-checkbox"> MFM Segment
+                </label>
                 <label>
                     <input type="checkbox" name="tr_segment" value="1" class="segment-checkbox"> TR Segment
+                </label>
                 <label>
                     <input type="checkbox" name="nyss_segment" value="1" class="segment-checkbox"> NYSS Segment
                 </label>
-                </div>
-
+            </div>
 
             {{-- Upload Button --}}
             <div class="flex gap-4 mt-4">
@@ -119,9 +105,9 @@
                                 <td class="p-3">{{ $row->last_name }}</td>
                                 <td class="p-3">{{ $row->phone_no }}</td>
                                 <td class="p-3">{{ $row->brand }}</td>
-                                <td class="p-3">{{ $row->mfm_segment ? '✔' : '✖' }}</td>
-                                <td class="p-3">{{ $row->tr_segment ? '✔' : '✖' }}</td>
-                                <td class="p-3">{{ $row->nyss_segment ? '✔' : '✖' }}</td>
+                                <td class="p-3">{{ $row->mfm_segment }}</td>
+                                <td class="p-3">{{ $row->tr_segment }}</td>
+                                <td class="p-3">{{ $row->nyss_segment }}</td>
                                 <td class="p-3">{{ $row->last_transaction_date }}</td>
                                 <td class="p-3">{{ $row->last_visited_store }}</td>
                                 <td class="p-3">{{ $row->remaining_points }}</td>
@@ -151,7 +137,6 @@
             });
         });
     </script> --}}
-
 
 </body>
 </html>
