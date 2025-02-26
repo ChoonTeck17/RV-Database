@@ -13,7 +13,7 @@
         <div class="flex justify-center mb-4">
             <img src="{{ asset('images/EDVERTICA.png') }}" alt="Upload Image" class="h-16 w-16 object-cover rounded-full">
         </div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Upload Excel File</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Upload Easdasdasdxcel File</h2>
 
         {{-- Success and Error Messages --}}
         @if(session('success'))
@@ -37,7 +37,7 @@
             </label>
 
             {{-- Segment Selection --}}
-            <div class="grid grid-cols-3 gap-4 mt-2">
+            {{-- <div class="grid grid-cols-3 gap-4 mt-2">
                 <span class="text-gray-700">Select Segments:</span>
                 <label>
                     <input type="checkbox" name="mfm_segment" value="1" class="segment-checkbox"> MFM Segment
@@ -48,7 +48,7 @@
                 <label>
                     <input type="checkbox" name="nyss_segment" value="1" class="segment-checkbox"> NYSS Segment
                 </label>
-            </div>
+            </div> --}}
 
             {{-- Upload Button --}}
             <div class="flex gap-4 mt-4">
@@ -94,6 +94,7 @@
                             <th class="p-3">Last Visited Store</th>
                             <th class="p-3">Remaining Points</th>
                             <th class="p-3">Points Last Updated</th>
+                            <th class="p-3">Points Last Updated Month</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -112,6 +113,7 @@
                                 <td class="p-3">{{ $row->last_visited_store }}</td>
                                 <td class="p-3">{{ $row->remaining_points }}</td>
                                 <td class="p-3">{{ $row->points_last_updated }}</td>
+                                <td class="p-3">{{ $row->points_last_updated_month }}</td>
                             </tr>
                         @endforeach
                     </tbody>
