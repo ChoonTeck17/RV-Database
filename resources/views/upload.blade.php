@@ -36,6 +36,11 @@
                     class="block w-full mt-2 p-2 border border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
             </label>
 
+            <input type="radio" name="file_type" value="nps" class="file-type-radio" required> NPS
+            <input type="radio" name="file_type" value="raw" class="file-type-radio" required> Raw
+            <input type="radio" name="file_type" value="rfm" class="file-type-radio" required> RFM
+
+            {{-- Pagination --}}    
             {{-- Segment Selection --}}
             {{-- <div class="grid grid-cols-3 gap-4 mt-2">
                 <span class="text-gray-700">Select Segments:</span>

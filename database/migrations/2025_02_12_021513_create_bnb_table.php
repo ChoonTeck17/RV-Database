@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('last_visited_store')->nullable();
             $table->integer('remaining_points')->default(0);
             $table->timestamp('points_last_updated')->nullable();
-            $table->timestamp('points_last_updated_month');
+            $table->string('points_last_updated_month')->nullable();
 
             $table->timestamps();
         });

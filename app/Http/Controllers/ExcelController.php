@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\ExcelImport;
+use App\Imports\NPSImport;
+use App\Imports\RAWImport;
+use App\Imports\RFMImport;
 use App\Models\Bnb;
 use App\Exports\DataExport;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,7 +19,17 @@ class ExcelController extends Controller
             'file' => 'required|mimes:xlsx,xls,csv|max:2048',
         ]);
 
-        Excel::import(new ExcelImport(), $request->file('file'));
+        $data = $request->all();
+
+        if($data['file_type'] == 'nps'){
+            Excel::import(new NPSImport(), $request->file('file'));
+        }else if($data['file_type'] == 'raw'){
+            Excel::import(new RAWImport(), $request->file('file'));
+        }else if($data['file_type'] == 'rfm'){
+            Excel::import(new RFMImport(), $request->file('file'));
+        } 
+      
+        // Excel::import(new ExcelImport(), $request->file('file'));
 
         return redirect()->back()->with('success', 'Data Imported Successfully!');
     }
