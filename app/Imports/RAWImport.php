@@ -4,39 +4,56 @@ namespace App\Imports;
 
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class RAWImport implements ToCollection
+class RAWImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
-        $rows->shift(); // Remove header row if present (assuming first row is a header)
-
         foreach ($rows as $row) {
-            $card_no = $row[0] ?? null;
+            // Access columns by header names
+            $card_no = $row['card_no'] ?? null;
             if (!$card_no) {
                 continue; // Skip if no card number
             }
 
-            $email                     = $row[1] ?? null;
-            $last_name                  = $row[2] ?? null;
-            $phone_no                   = $row[3] ?? null;
-            $remaining_points          = $row[4] ?? 0;  // FIXED: Now correctly assigned
-            $points_last_updated         = $this->parseDate($row[5] ?? null); 
-            $points_last_updated_month    = $this->parseMonth($row[6] ?? null); // FIXED: "January" now goes here
+            $email = $row['email'] ?? null;
+            $last_name = $row['last_name'] ?? null;
+            $phone_no = $row['phone_no'] ?? null;
+            $remaining_points = $row['remaining_points'] ?? 0; // Default to 0 if missing
+            $points_last_updated = $this->parseDate($row['points_last_updated'] ?? null);
+            $points_last_updated_month = $this->parseMonth($row['points_last_updated_month'] ?? null);
+
+            // Build update data dynamically to avoid overwriting with null
+            $updateData = [
+                'updated_at' => now(),
+            ];
+
+            // Only include fields present in the row and not null
+            if ($row->has('last_name') && !is_null($last_name)) {
+                $updateData['last_name'] = $last_name;
+            }
+            if ($row->has('phone_no') && !is_null($phone_no)) {
+                $updateData['phone_no'] = $phone_no;
+            }
+            if ($row->has('remaining_points') && !is_null($remaining_points)) {
+                $updateData['remaining_points'] = $remaining_points;
+            }
+            if ($row->has('points_last_updated') && !is_null($points_last_updated)) {
+                $updateData['points_last_updated'] = $points_last_updated;
+            }
+            if ($row->has('points_last_updated_month') && !is_null($points_last_updated_month)) {
+                $updateData['points_last_updated_month'] = $points_last_updated_month;
+            }
+
             
-            if($email && $remaining_points >= 150){
+            // Update or insert only if email exists and points meet the threshold
+            if ($email && $remaining_points >= 150) {
                 DB::table('bnb')->updateOrInsert(
-                    ['card_no' => $card_no, 'email' => $email], // Ensure unique card_no
-                    [
-                        'last_name'             => $last_name,
-                        'phone_no'              => $phone_no,
-                        'remaining_points'          => $remaining_points,
-                        'points_last_updated'       => $points_last_updated,
-                        'points_last_updated_month' => $points_last_updated_month,
-                        'updated_at'                => now(),
-                    ]
+                    ['card_no' => $card_no, 'email' => $email],
+                    $updateData
                 );
             }
         }
@@ -44,7 +61,7 @@ class RAWImport implements ToCollection
 
     private function parseDate($value)
     {
-        if (!$value) {
+        if (is_null($value) || trim($value) === '') {
             return null;
         }
 
@@ -52,12 +69,16 @@ class RAWImport implements ToCollection
             return Carbon::create(1900, 1, 1)->addDays($value - 2)->toDateString();
         }
 
-        return Carbon::parse(trim($value))->toDateString();
+        try {
+            return Carbon::parse(trim($value))->toDateString();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     private function parseMonth($value)
     {
-        if (!$value) {
+        if (is_null($value) || trim($value) === '') {
             return null;
         }
 

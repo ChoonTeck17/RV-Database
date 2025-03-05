@@ -33,11 +33,12 @@ class RFMImport implements ToCollection
             $column_type = $brand == 'mfm' ? 'mfm_segment' : ($brand == 'tr' ? 'tr_segment' : ($brand == 'nyss' ? 'nyss_segment' : null));
             
             
-            if($column_type && $email){
+            if($column_type){
                 DB::table('bnb')->updateOrInsert(
-                    ['card_no' => $card_no, 'email'=> $email], // Ensure unique card_no
+                    ['card_no' => $card_no], // Ensure unique card_no
                     
                     [
+                        'email'                 => $email,
                         'last_name'             => $last_name,
                         'phone_no'              => $phone_no,
                         'brand'      => DB::raw(
