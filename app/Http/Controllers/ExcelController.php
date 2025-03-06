@@ -58,14 +58,8 @@ class ExcelController extends Controller
         Excel::import(new NPSImport(), $request->file('file'));
 
         $data = Bnb::whereNotNull('last_transaction_date')->paginate(10);
+        // $data = Bnb::paginate(10); // Adjust filtering if RFM has specific criteria
         return view('NpsUpload', compact('data'))->with('success', 'NPS file uploaded successfully!');
-    }
-
-    public function showNPSUpload(Request $request)
-    {
-        $perPage = $request->input('per_page', 10);
-        $data = Bnb::whereNotNull('last_transaction_date')->paginate($perPage);
-        return view('NpsUpload', compact('data')); // Note the case sensitivity
     }
 
     public function uploadRFM(Request $request)
@@ -77,15 +71,10 @@ class ExcelController extends Controller
         Excel::import(new RFMImport(), $request->file('file'));
 
         $data = Bnb::paginate(10); // Adjust filtering if RFM has specific criteria
+        $data = Bnb::whereNotNull('brand')->paginate(10);
         return view('RFMUpload', compact('data'))->with('success', 'RFM file uploaded successfully!');
     }
 
-    public function showRFMUpload(Request $request)
-    {
-        $perPage = $request->input('per_page', 10);
-        $data = Bnb::paginate($perPage); // Adjust filtering if RFM has specific criteria
-        return view('RFMUpload', compact('data'));
-    }
     public function uploadRAW(Request $request)
     {
         $request->validate([
@@ -95,13 +84,29 @@ class ExcelController extends Controller
         Excel::import(new RAWImport(), $request->file('file'));
 
         $data = Bnb::paginate(10); // Adjust filtering if RFM has specific criteria
+        $data = Bnb::whereNotNull('points_last_updated_month')->paginate(10);
         return view('RAWUpload', compact('data'))->with('success', 'RAW file uploaded successfully!');
+    }
+
+    public function showNPSUpload(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $data = Bnb::whereNotNull('last_transaction_date')->paginate($perPage);
+        return view('NpsUpload', compact('data')); // Note the case sensitivity
+    }
+
+
+    public function showRFMUpload(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $data = Bnb::whereNotNull('brand')->paginate($perPage); // Adjust filtering if RFM has specific criteria
+        return view('RFMUpload', compact('data'));
     }
 
     public function showRAWUpload(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $data = Bnb::paginate($perPage); // Adjust filtering if RFM has specific criteria
+        $data = Bnb::whereNotNull('points_last_updated_month')->paginate($perPage); // Adjust filtering if RFM has specific criteria
         return view('RAWUpload', compact('data'));
     }
 

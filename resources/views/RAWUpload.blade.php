@@ -58,32 +58,30 @@
             </div>
 
             <div class="overflow-x-auto mt-4">
-                <table class="w-full border-collapse bg-white shadow-md rounded-lg">
+                <table class="w-full border-collapse bg-white shadow-md rounded-lg border border-gray-300">
                     <thead class="bg-gray-200 text-gray-700">
                         <tr>
-                            <th class="p-3">ID</th>
-                            <th class="p-3">Card No</th>
-                            <th class="p-3">Email</th>
-                            <th class="p-3">Last Name</th>
-                            <th class="p-3">Phone No</th>
-                            <th class="p-3">Remaining points</th>
-                            <th class="p-3">Points Last updated</th>
-                            <th class="p-3">Points Last updated month</th>
-
+                            <th class="p-3 border border-gray-300 text-center">ID</th>
+                            <th class="p-3 border border-gray-300 text-center">Card No</th>
+                            <th class="p-3 border border-gray-300 text-center">Email</th>
+                            <th class="p-3 border border-gray-300 text-center">Last Name</th>
+                            <th class="p-3 border border-gray-300 text-center">Phone No</th>
+                            <th class="p-3 border border-gray-300 text-center">Remaining Points</th>
+                            <th class="p-3 border border-gray-300 text-center">Points Last Updated Date</th>
+                            <th class="p-3 border border-gray-300 text-center">Points Last Updated Month</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach($data as $row)
                             <tr class="hover:bg-gray-100 transition">
-                                <td class="p-3 text-center">{{ $row->id }}</td>
-                                <td class="p-3">{{ $row->card_no }}</td>
-                                <td class="p-3">{{ $row->email }}</td>
-                                <td class="p-3">{{ $row->last_name }}</td>
-                                <td class="p-3">{{ $row->phone_no }}</td>
-                                <td class="p-3">{{ $row->remaining_points }}</td>
-                                <td class="p-3">{{ $row->points_last_updated }}</td>
-                                <td class="p-3">{{ $row->points_last_updated_month }}</td>
-
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->id }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->card_no }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->email }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->last_name }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->phone_no }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->remaining_points }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->points_last_updated }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->points_last_updated_month }}</td>
                             </tr>
                         @endforeach
                     </tbody>

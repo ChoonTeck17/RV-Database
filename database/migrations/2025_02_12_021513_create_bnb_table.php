@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bnb', function (Blueprint $table) {
             $table->id(); // Primary Key (PK)
             $table->string('card_no')->unique(); // Unique constraint (U)
-            $table->string('email')->unique(); // Unique constraint (U)
+            $table->string('email'); // Unique constraint (U)
             $table->string('last_name');
             $table->string('phone_no');
             $table->string('brand');

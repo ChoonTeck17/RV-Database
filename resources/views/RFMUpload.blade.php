@@ -58,33 +58,32 @@
             </div>
 
             <div class="overflow-x-auto mt-4">
-                <table class="w-full border-collapse bg-white shadow-md rounded-lg">
+                <table class="w-full border-collapse bg-white shadow-md rounded-lg border border-gray-300">
                     <thead class="bg-gray-200 text-gray-700">
                         <tr>
-                            <th class="p-3">ID</th>
-                            <th class="p-3">Card No</th>
-                            <th class="p-3">Email</th>
-                            <th class="p-3">Last Name</th>
-                            <th class="p-3">Phone No</th>
-                            <th class="p-3">Brand</th>
-                            <th class="p-3">MFM Segment</th>
-                            <th class="p-3">TR Segment</th>
-                            <th class="p-3">NYSS Segment</th>
-
+                            <th class="p-3 border border-gray-300 text-center">ID</th>
+                            <th class="p-3 border border-gray-300 text-center">Card No</th>
+                            <th class="p-3 border border-gray-300 text-center">Email</th>
+                            <th class="p-3 border border-gray-300 text-center">Last Name</th>
+                            <th class="p-3 border border-gray-300 text-center">Phone No</th>
+                            <th class="p-3 border border-gray-300 text-center">Brand</th>
+                            <th class="p-3 border border-gray-300 text-center">MFM Segment</th>
+                            <th class="p-3 border border-gray-300 text-center">TR Segment</th>
+                            <th class="p-3 border border-gray-300 text-center">NYSS Segment</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach($data as $row)
                             <tr class="hover:bg-gray-100 transition">
-                                <td class="p-3 text-center">{{ $row->id }}</td>
-                                <td class="p-3">{{ $row->card_no }}</td>
-                                <td class="p-3">{{ $row->email }}</td>
-                                <td class="p-3">{{ $row->last_name }}</td>
-                                <td class="p-3">{{ $row->phone_no }}</td>
-                                <td class="p-3">{{ $row->brand }}</td>
-                                <td class="p-3">{{ $row->mfm_segment}}</td>
-                                <td class="p-3">{{ $row->tr_segment}}</td>
-                                <td class="p-3">{{ $row->nyss_segment}}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->id }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->card_no }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->email }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->last_name }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->phone_no }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->brand }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->mfm_segment }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->tr_segment }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->nyss_segment }}</td>
                             </tr>
                         @endforeach
                     </tbody>
