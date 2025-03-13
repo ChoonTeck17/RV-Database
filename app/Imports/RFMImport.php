@@ -4,52 +4,61 @@ namespace App\Imports;
 
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class RFMImport implements ToCollection
+class RFMImport implements ToCollection, WithHeadingRow
 {
-    // private $segmentType;
-    // public function __construct($segmentType){
-    //     $this->segmentType = $segmentType;
-    // }
+    protected $segments;
+
+    public function __construct(array $segments = [])
+    {
+        $this->segments = $segments; // e.g., ['mfm', 'tr']
+    }
 
     public function collection(Collection $rows)
     {
-        $rows->shift(); // Remove header row if present (assuming first row is a header)
-
         foreach ($rows as $row) {
-            $card_no = $row[0] ?? null;
+            $card_no = $row['card_no'] ?? null;
             if (!$card_no) {
                 continue; // Skip if no card number
             }
 
-            $email                  = $row[1] ?? null;
-            $last_name              = $row[2] ?? null;
-            $phone_no               = $row[3] ?? null;
-            $brand                  = $row[4] ?? null;
-            $segment                = $row[4] . ' '. $row[5] ?? null;
-            
-            $column_type = $brand == 'mfm' ? 'mfm_segment' : ($brand == 'tr' ? 'tr_segment' : ($brand == 'nyss' ? 'nyss_segment' : null));
-            
-            
-            if($column_type){
-                DB::table('bnb')->updateOrInsert(
-                    ['card_no' => $card_no], // Ensure unique card_no
-                    
-                    [
-                        'email'                 => $email,
-                        'last_name'             => $last_name,
-                        'phone_no'              => $phone_no,
-                        'brand'      => DB::raw(
-                            "IF(brand IS NULL OR brand = '', '$brand', " .
-                                    "IF(FIND_IN_SET('$brand', brand), brand, CONCAT(brand, ',', '$brand')))"
-                        ),
-                        $column_type            => $segment,
-                        'updated_at'            => now(),
-                    ]
-                );
+            $email = $row['email'] ?? null;
+            if (!$email) {
+                continue; // Skip if no email
             }
+
+            $updateData = [
+                'last_name' => $row['name'] ?? null,
+                'email' => $email,
+                'phone_no' => $row['phone'] ?? null,
+                'brand' => $row['brand'] ?? null,
+                'source' => 'rfm', // Tag as RFM data
+                'updated_at' => now(),
+            ];
+
+            // Assume the Excel file has a 'segment' column with values like "Champions"
+            $segment = $row['segment'] ?? null;
+
+            // Modify segment values based on checked boxes and store in respective columns
+            if ($segment) {
+                if (in_array('mfm', $this->segments)) {
+                    $updateData['mfm_segment'] = "MFM $segment"; // e.g., "MFM Champions"
+                }
+                if (in_array('tr', $this->segments)) {
+                    $updateData['tr_segment'] = "TR $segment"; // e.g., "TR Champions"
+                }
+                if (in_array('nyss', $this->segments)) {
+                    $updateData['nyss_segment'] = "NYSS $segment"; // e.g., "NYSS Champions"
+                }
+            }
+
+            DB::table('bnb')->updateOrInsert(
+                ['card_no' => $card_no],
+                $updateData
+            );
         }
     }
 
@@ -63,7 +72,11 @@ class RFMImport implements ToCollection
             return Carbon::create(1900, 1, 1)->addDays($value - 2)->toDateString();
         }
 
-        return Carbon::parse(trim($value))->toDateString();
+        try {
+            return Carbon::parse(trim($value))->toDateString();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     private function parseMonth($value)

@@ -47,14 +47,11 @@
             <h3 class="text-xl font-semibold text-gray-800 mt-6">Stored NPS Data</h3>
 
             <div class="flex justify-center gap-8 mt-6">
-                <a href="{{ route('download.excel') }}" 
+                <a href="{{ route('download.excel', ['type' => 'nps']) }}" 
                    class="flex items-center gap-2 justify-center font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1 hover:scale-105">
                     📊 Download Excel
                 </a>
-                <a href="{{ route('download.pdf') }}" 
-                   class="flex items-center gap-2 justify-center font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1 hover:scale-105">
-                    📄 Download PDF
-                </a>
+
             </div>
 
             <div class="overflow-x-auto mt-4">

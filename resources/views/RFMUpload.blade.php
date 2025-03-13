@@ -13,6 +13,8 @@
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Upload RFM Excel File</h2>
 
+        <input type="radio" name="uploadType" id="nps" value="nps" class="hidden">
+
         {{-- Success and Error Messages --}}
         @if(session('success'))
             <p class="text-green-600 font-semibold bg-green-100 p-2 rounded-md">{{ session('success') }}</p>
@@ -28,6 +30,21 @@
         {{-- Upload Form --}}
         <form id="uploadForm" action="{{ route('rfm.upload.process') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
+            <div class="flex gap-4 mb-4">
+                <label class="flex items-center">
+                    <input type="checkbox" name="segments[]" value="mfm" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="ml-2 text-gray-700">MFM</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" name="segments[]" value="tr" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="ml-2 text-gray-700">TR</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" name="segments[]" value="nyss" class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="ml-2 text-gray-700">NYSS</span>
+                </label>
+            </div>
+
             <label class="block">
                 <span class="text-gray-700">Choose an RFM Excel file</span>
                 <input type="file" name="file" required 
@@ -47,13 +64,9 @@
             <h3 class="text-xl font-semibold text-gray-800 mt-6">Stored RFM Data</h3>
 
             <div class="flex justify-center gap-8 mt-6">
-                <a href="{{ route('download.excel') }}" 
+                <a href="{{ route('download.excel', ['type' => 'rfm']) }}" 
                    class="flex items-center gap-2 justify-center font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1 hover:scale-105">
                     📊 Download Excel
-                </a>
-                <a href="{{ route('download.pdf') }}" 
-                   class="flex items-center gap-2 justify-center font-semibold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:-translate-y-1 hover:scale-105">
-                    📄 Download PDF
                 </a>
             </div>
 

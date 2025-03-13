@@ -38,6 +38,7 @@ class NPSImport implements ToCollection, WithHeadingRow
                         'phone_no' => $phone_no,
                         'last_transaction_date' => $last_transaction_date,
                         'last_visited_store' => $last_visited_store,
+                        'source' => 'nps', // Tag as NPS data
                         'updated_at' => now(),
                     ]
                 );

@@ -23,10 +23,9 @@ class RAWImport implements ToCollection, WithHeadingRow
             $last_name = $row['name'] ?? null;
             $phone_no = $row['mobile_number'] ?? null;
             $remaining_points = $row['remaining_point'] ?? 0; // Default to 0 if missing
-            $points_last_updated =$row['points_last_updated_date'] ?? null;
-            $points_last_updated = $this->parseDate($row['points_last_updated_date'] ?? null); // Parse date 
+            $points_last_updated = $this->parseDate($row['points_last_updated_date'] ?? null); // Parse date
             $points_last_updated_month = $this->parseMonth($row['statement_month'] ?? null);
-            
+
             if ($email) {
                 DB::table('bnb')->updateOrInsert(
                     ['card_no' => $card_no],
@@ -37,6 +36,7 @@ class RAWImport implements ToCollection, WithHeadingRow
                         'remaining_points' => $remaining_points,
                         'points_last_updated' => $points_last_updated,
                         'points_last_updated_month' => $points_last_updated_month,
+                        'source' => 'raw', // Tag as Raw data
                         'updated_at' => now(),
                     ]
                 );
@@ -44,27 +44,10 @@ class RAWImport implements ToCollection, WithHeadingRow
 
             // Build update data dynamically to avoid overwriting with null
             $updateData = [
+                'source' => 'raw', // Tag as Raw data
                 'updated_at' => now(),
             ];
 
-            // // Only include fields present in the row and not null
-            // if ($row->has('last_name') && !is_null($last_name)) {
-            //     $updateData['last_name'] = $last_name;
-            // }
-            // if ($row->has('phone_no') && !is_null($phone_no)) {
-            //     $updateData['phone_no'] = $phone_no;
-            // }
-            // if ($row->has('remaining_points') && !is_null($remaining_points)) {
-            //     $updateData['remaining_points'] = $remaining_points;
-            // }
-            // if ($row->has('points_last_updated') && !is_null($points_last_updated)) {
-            //     $updateData['points_last_updated'] = $points_last_updated;
-            // }
-            // if ($row->has('points_last_updated_month') && !is_null($points_last_updated_month)) {
-            //     $updateData['points_last_updated_month'] = $points_last_updated_month;
-            // }
-
-            
             // Update or insert only if email exists and points meet the threshold
             if ($email && $remaining_points >= 150) {
                 DB::table('bnb')->updateOrInsert(
@@ -75,7 +58,7 @@ class RAWImport implements ToCollection, WithHeadingRow
         }
     }
 
-    private function parseDate($value)
+private function parseDate($value)
     {
         if (is_null($value) || trim($value) === '') {
             return null;

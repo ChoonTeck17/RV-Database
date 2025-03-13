@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\NPSImport;
@@ -65,14 +66,13 @@ class ExcelController extends Controller
     public function uploadRFM(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'file' => 'required|mimes:xlsx,xls',
+            'segments' => 'nullable|array', // Optional, ensures segments is an array
         ]);
-
-        Excel::import(new RFMImport(), $request->file('file'));
-
-        $data = Bnb::paginate(10); // Adjust filtering if RFM has specific criteria
-        $data = Bnb::whereNotNull('brand')->paginate(10);
-        return view('RFMUpload', compact('data'))->with('success', 'RFM file uploaded successfully!');
+    
+        $segments = $request->input('segments', []); // e.g., ['mfm', 'tr']
+        Excel::import(new RFMImport($segments), $request->file('file'));
+        return redirect()->back()->with('success', 'RFM data uploaded successfully');
     }
 
     public function uploadRAW(Request $request)
@@ -81,12 +81,11 @@ class ExcelController extends Controller
             'file' => 'required|mimes:xlsx,xls,csv|max:2048',
         ]);
 
-        Excel::import(new RAWImport(), $request->file('file'));
-
+        Excel::import(new RAWImport, $request->file('file'));
         $data = Bnb::paginate(10); // Adjust filtering if RFM has specific criteria
         $data = Bnb::whereNotNull('points_last_updated_month')->paginate(10);
-        return view('RAWUpload', compact('data'))->with('success', 'RAW file uploaded successfully!');
-    }
+        return redirect()->back()->with('success', 'Raw data uploaded successfully');
+        }
 
     public function showNPSUpload(Request $request)
     {
@@ -113,9 +112,9 @@ class ExcelController extends Controller
     
     public function downloadExcel()
     {
-        return Excel::download(new DataExport, 'data.xlsx');
+        $exportType = request()->query('type', 'all'); // Get 'type' from query, default to 'all'
+        return Excel::download(new DataExport($exportType), 'data.xlsx');
     }
-
     public function downloadPDF()
     {
         $data = Bnb::all();
