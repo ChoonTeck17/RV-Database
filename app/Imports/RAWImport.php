@@ -26,7 +26,7 @@ class RAWImport implements ToCollection, WithHeadingRow
             $points_last_updated = $this->parseDate($row['points_last_updated_date'] ?? null); // Parse date
             $points_last_updated_month = $this->parseMonth($row['statement_month'] ?? null);
 
-            if ($email) {
+            if ($email && $remaining_points >= 150) {
                 DB::table('bnb')->updateOrInsert(
                     ['card_no' => $card_no],
                     [
@@ -43,18 +43,18 @@ class RAWImport implements ToCollection, WithHeadingRow
             }
 
             // Build update data dynamically to avoid overwriting with null
-            $updateData = [
-                'source' => 'raw', // Tag as Raw data
-                'updated_at' => now(),
-            ];
+            // $updateData = [
+            //     'source' => 'raw', // Tag as Raw data
+            //     'updated_at' => now(),
+            // ];
 
             // Update or insert only if email exists and points meet the threshold
-            if ($email && $remaining_points >= 150) {
-                DB::table('bnb')->updateOrInsert(
-                    ['card_no' => $card_no, 'email' => $email],
-                    $updateData
-                );
-            }
+            // if ($email && $remaining_points >= 150) {
+            //     DB::table('bnb')->updateOrInsert(
+            //         ['card_no' => $card_no, 'email' => $email],
+            //         $updateData
+            //     );
+            // }
         }
     }
 
