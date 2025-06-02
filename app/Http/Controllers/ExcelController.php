@@ -78,7 +78,7 @@ class ExcelController extends Controller
     public function uploadRAW(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+            'file' => 'required|mimes:xlsx,xls,csv|max:20480',
         ]);
 
         Excel::import(new RAWImport, $request->file('file'));

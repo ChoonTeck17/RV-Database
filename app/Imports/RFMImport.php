@@ -35,7 +35,8 @@ class RFMImport implements ToCollection, WithHeadingRow
                 'email' => $email,
                 'phone_no' => $row['phone'] ?? null,
                 'brand' => $row['brand'] ?? null,
-                'source' => 'rfm', // Tag as RFM data
+                'source' => 'rfm', 
+                'birthday' => $this->parseDate($row['birthday'] ?? null),
                 'updated_at' => now(),
             ];
 

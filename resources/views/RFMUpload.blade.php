@@ -83,6 +83,8 @@
                             <th class="p-3 border border-gray-300 text-center">MFM Segment</th>
                             <th class="p-3 border border-gray-300 text-center">TR Segment</th>
                             <th class="p-3 border border-gray-300 text-center">NYSS Segment</th>
+                            <th class="p-3 border border-gray-300 text-center">Birthday</th>
+
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -97,6 +99,8 @@
                                 <td class="p-3 border border-gray-300 text-center">{{ $row->mfm_segment }}</td>
                                 <td class="p-3 border border-gray-300 text-center">{{ $row->tr_segment }}</td>
                                 <td class="p-3 border border-gray-300 text-center">{{ $row->nyss_segment }}</td>
+                                <td class="p-3 border border-gray-300 text-center">{{ $row->birthday }}</td>
+
                             </tr>
                         @endforeach
                     </tbody>

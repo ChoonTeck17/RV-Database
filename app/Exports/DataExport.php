@@ -44,6 +44,7 @@ class DataExport implements FromCollection, WithHeadings
                 'mfm_segment',
                 'tr_segment',
                 'nyss_segment',
+                'birthday',
             ],
             default => [
                 'card_no',
@@ -94,6 +95,7 @@ class DataExport implements FromCollection, WithHeadings
                 'MFM Segment',
                 'TR Segment',
                 'NYSS Segment',
+                'Birthday',
             ],
             default => [
                 'Card No',
